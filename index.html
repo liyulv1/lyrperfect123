@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>李烨冉规划助手</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366F1',
+                        secondary: '#34D399',
+                        warning: '#FBBF24',
+                        danger: '#F87171',
+                        dark: '#0F172A',
+                        light: '#F8FAFC',
+                        glass: 'rgba(255,255,255,0.85)'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-in-out',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                    },
+                    keyframes: {
+                        fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+                        slideUp: { '0%': { transform: 'translateY(10px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glass {
+                background: rgba(255, 255, 255, 0.85);
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+            }
+            .btn-effect {
+                @apply transition-all duration-200 active:scale-95;
+            }
+            .tab-new {
+                @apply px-5 py-3 rounded-t-lg transition-all duration-200 font-medium;
+            }
+            .tab-new-active {
+                @apply bg-primary text-white shadow-md;
+            }
+            .input-focus {
+                @apply focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 min-h-screen font-inter text-dark antialiased">
+    <!-- 顶部导航 -->
+    <header class="sticky top-0 z-50 glass shadow-sm">
+        <div class="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-indigo-400 flex items-center justify-center text-white text-xl shadow-lg">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </div>
+                <h1 class="text-[clamp(1.2rem,3vw,1.8rem)] font-bold bg-gradient-to-r from-primary to-indigo-500 bg-clip-text text-transparent">Time management</h1>
+            </div>
+            <p class="text-sm text-gray-500">别偷懒！认真控制好时间</p>
+        </div>
+    </header>
+
+    <!-- 主体 -->
+    <main class="container mx-auto px-4 py-8 animate-fade-in">
+        <!-- 标签栏 -->
+        <div class="flex overflow-x-auto gap-2 mb-8 pb-1 scrollbar-hide">
+            <button data-tab="course" class="tab-new tab-new-active btn-effect flex items-center gap-1">
+                <i class="fa-solid fa-book"></i> 课程管理
+            </button>
+            <button data-tab="task" class="tab-new bg-white/70 hover:bg-white text-gray-700 btn-effect flex items-center gap-1">
+                <i class="fa-solid fa-list-check"></i> 任务规划
+            </button>
+            <button data-tab="goal" class="tab-new bg-white/70 hover:bg-white text-gray-700 btn-effect flex items-center gap-1">
+                <i class="fa-solid fa-bullseye"></i> 目标管理
+            </button>
+            <button data-tab="focus" class="tab-new bg-white/70 hover:bg-white text-gray-700 btn-effect flex items-center gap-1">
+                <i class="fa-solid fa-hourglass-half"></i> 专注模式
+            </button>
+        </div>
+
+        <!-- 内容模块 -->
+        <div class="tab-content">
+            <!-- 课程管理 -->
+            <div id="course-content" class="tab-panel block animate-slide-up">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="glass rounded-2xl p-6 shadow card-hover">
+                        <h3 class="text-lg font-semibold mb-5 flex items-center gap-2">
+                            <i class="fa-solid fa-plus text-primary"></i> 添加课程
+                        </h3>
+                        <form id="course-form" class="space-y-4">
+                            <input type="text" placeholder="课程名称" id="course-name" required class="w-full p-3 rounded-xl border border-gray-200 input-focus">
+                            <input type="text" placeholder="任课老师" id="course-teacher" class="w-full p-3 rounded-xl border border-gray-200 input-focus">
+                            <input type="text" placeholder="上课教室" id="course-room" class="w-full p-3 rounded-xl border border-gray-200 input-focus">
+                            <select id="course-week" class="w-full p-3 rounded-xl border border-gray-200 input-focus">
+                                <option>周一</option><option>周二</option><option>周三</option><option>周四</option><option>周五</option><option>周六</option><option>周日</option>
+                            </select>
+                            <input type="text" placeholder="节次 (如：1-2节)" id="course-time" class="w-full p-3 rounded-xl border border-gray-200 input-focus">
+                            <button type="submit" class="w-full bg-primary text-white py-3 rounded-xl btn-effect shadow-md hover:bg-primary/90">保存课程</button>
+                        </form>
+                    </div>
+
+                    <div class="lg:col-span-2 glass rounded-2xl p-6 shadow card-hover">
+                        <h3 class="text-lg font-semibold mb-5 flex items-center gap-2">
+                            <i class="fa-solid fa-table-cells text-primary"></i> 我的课程表
+                        </h3>
+                        <div id="course-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[520px] overflow-y-auto pr-2">
+                            <div class="text-gray-400 text-center py-12">暂无课程，快去添加吧~</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 任务规划 -->
+            <div id="task-content" class="tab-panel hidden animate-slide-up">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="glass rounded-2xl p-6 shadow card-hover">
+                        <h3 class="text-lg font-semibold mb-5 flex items-center gap-2">
+                            <i class="fa-solid fa-plus text-primary"></i> 新建任务
+                        </h3>
+                        <form id="task-form" class="space-y-4">
+                            <input type="text" placeholder="任务名称" id="task-title" required class="w-full p-3 rounded-xl border border-gray-200 input-focus">
+                            <select id="task-type" class="w-full p-3 rounded-xl border border-gray-200 input-focus">
+                                <option>课程作业</option><option>社团工作</option><option>备考学习</option><option>生活日常</option><option>其他</option>
+                            </select>
+                            <input type="date" id="task-ddl" required class="w-full p-3 rounded-xl border border-gray-200 input-focus">
+                            <select id="task-priority" class="w-full p-3 rounded-xl border border-gray-200 input-focus">
+                                <option value="high">高优先级</option>
+                                <option value="middle">中优先级</option>
+                                <option value="low">低优先级</option>
+                            </select>
+                            <button type="submit" class="w-full bg-primary text-white py-3 rounded-xl btn-effect shadow-md hover:bg-primary/90">添加任务</button>
+                        </form>
+                    </div>
+
+                    <div class="lg:col-span-2 glass rounded-2xl p-6 shadow card-hover">
+                        <h3 class="text-lg font-semibold mb-5 flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-primary"></i> 待办任务
+                        </h3>
+                        <div id="task-list" class="space-y-4 max-h-[520px] overflow-y-auto pr-2">
+                            <div class="text-gray-400 text-center py-12">暂无任务，快去添加吧~</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 目标管理 -->
+            <div id="goal-content" class="tab-panel hidden animate-slide-up">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="glass rounded-2xl p-6 shadow card-hover">
+                        <h3 class="text-lg font-semibold mb-5 flex items-center gap-2">
+                            <i class="fa-solid fa-plus text-primary"></i> 新建目标
+                        </h3>
+                        <form id="goal-form" class="space-y-4">
+                            <input type="text" placeholder="目标名称（如：六级550分）" id="goal-title" required class="w-full p-3 rounded-xl border border-gray-200 input-focus">
+                            <input type="number" placeholder="总进度值（如：100）" id="goal-total" required class="w-full p-3 rounded-xl border border-gray-200 input-focus">
+                            <input type="text" placeholder="目标描述" id="goal-desc" class="w-full p-3 rounded-xl border border-gray-200 input-focus">
+                            <button type="submit" class="w-full bg-primary text-white py-3 rounded-xl btn-effect shadow-md hover:bg-primary/90">创建目标</button>
+                        </form>
+                    </div>
+
+                    <div class="lg:col-span-2 glass rounded-2xl p-6 shadow card-hover">
+                        <h3 class="text-lg font-semibold mb-5 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-primary"></i> 我的目标
+                        </h3>
+                        <div id="goal-list" class="space-y-5 max-h-[520px] overflow-y-auto pr-2">
+                            <div class="text-gray-400 text-center py-12">暂无目标，快去添加吧~</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 专注模式 -->
+           <div id="focus-content" class="tab-panel hidden animate-slide-up">
+    <div class="max-w-xl mx-auto glass rounded-3xl p-10 shadow-xl text-center card-hover">
+        <h3 class="text-xl font-semibold mb-8 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-moon text-primary"></i> 番茄专注时钟
+        </h3>
+
+        <div id="focus-time" class="text-[clamp(2.5rem,8vw,5rem)] font-bold text-primary my-6 tracking-wider">25:00</div>
+
+        <div class="flex justify-center gap-4 mb-10">
+            <button id="focus-start" class="bg-secondary text-white px-8 py-4 rounded-xl btn-effect shadow-md hover:bg-secondary/90">
+                <i class="fa-solid fa-play mr-1"></i> 开始专注
+            </button>
+            <button id="focus-pause" class="bg-warning text-white px-8 py-4 rounded-xl btn-effect shadow-md hover:bg-warning/90 hidden">
+                <i class="fa-solid fa-pause mr-1"></i> 暂停
+            </button>
+            <button id="focus-reset" class="bg-gray-500 text-white px-8 py-4 rounded-xl btn-effect shadow-md hover:bg-gray-600">
+                <i class="fa-solid fa-rotate-right mr-1"></i> 重置
+            </button>
+        </div>
+
+        <div class="border-t border-gray-200 pt-6 mb-6">
+            <h4 class="font-medium mb-4 text-gray-600">自定义专注时长</h4>
+            <div class="flex justify-center gap-3 items-center">
+                <input type="number" id="custom-focus" placeholder="分钟" min="1" class="w-24 p-3 rounded-xl border text-center">
+                <button id="apply-custom" class="px-5 py-3 bg-primary text-white rounded-xl btn-effect">应用</button>
+            </div>
+        </div>
+
+        <div class="text-gray-600 text-base">
+            今日专注总时长：<span id="today-focus" class="text-primary font-bold text-lg">0</span> 分钟
+        </div>
+    </div>
+</div>
+
+
+    <!-- 页脚 -->
+    <footer class="py-6 text-center text-gray-400 text-sm mt-10">
+        <div class="container mx-auto">大学生时间规划助手 © 2026 | 全周期学习管理工具</div>
+    </footer>
+
+    <script>
+        // 本地存储
+        const Storage = {
+            set: (k, d) => localStorage.setItem(k, JSON.stringify(d)),
+            get: k => JSON.parse(localStorage.getItem(k)) || []
+        }
+
+        // 标签切换
+        const tabs = document.querySelectorAll('[data-tab]');
+        const panels = document.querySelectorAll('.tab-panel');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('tab-new-active'));
+                tab.classList.add('tab-new-active');
+                const target = tab.dataset.tab;
+                panels.forEach(p => p.classList.add('hidden'));
+                document.getElementById(`${target}-content`).classList.remove('hidden');
+            });
+        });
+
+        // === 课程管理 ===
+        const courseForm = document.getElementById('course-form');
+        const courseList = document.getElementById('course-list');
+        let courses = Storage.get('courses');
+
+        function renderCourses() {
+            if(courses.length === 0) {
+                courseList.innerHTML = '<div class="text-gray-400 text-center py-12">暂无课程，快去添加吧~</div>'; return;
+            }
+            courseList.innerHTML = courses.map((item, i) => `
+            <div class="bg-white rounded-xl p-4 shadow-sm hover:shadow transition-all">
+                <div class="font-medium text-lg mb-1">${item.name}</div>
+                <div class="text-sm text-gray-600">👨‍🏫${item.teacher}</div>
+                <div class="text-sm text-gray-600">📍 ${item.room}</div>
+                <div class="text-xs text-primary mt-2 font-medium">📅 ${item.week} | ${item.time}</div>
+                <button onclick="delCourse(${i})" class="mt-3 text-xs text-danger btn-effect">删除</button>
+            </div>`).join('');
+        }
+
+        courseForm.addEventListener('submit', e => {
+            e.preventDefault();
+            courses.push({
+                name: document.getElementById('course-name').value,
+                teacher: document.getElementById('course-teacher').value,
+                room: document.getElementById('course-room').value,
+                week: document.getElementById('course-week').value,
+                time: document.getElementById('course-time').value
+            });
+            Storage.set('courses', courses);
+            renderCourses();
+            courseForm.reset();
+        });
+
+        window.delCourse = i => {
+            courses.splice(i,1); Storage.set('courses', courses); renderCourses();
+        }
+
+        // === 任务管理 ===
+        const taskForm = document.getElementById('task-form');
+        const taskList = document.getElementById('task-list');
+        let tasks = Storage.get('tasks');
+
+        function renderTasks() {
+            if(tasks.length === 0) {
+                taskList.innerHTML = '<div class="text-gray-400 text-center py-12">暂无任务，快去添加吧~</div>'; return;
+            }
+            taskList.innerHTML = tasks.map((item,i) => `
+            <div class="bg-white rounded-xl p-4 shadow-sm ${item.done ? 'opacity-60 line-through' : ''}">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <div class="font-medium">${item.title}</div>
+                        <div class="text-xs text-gray-500 mt-1">类型：${item.type} | 截止：${item.ddl}</div>
+                        <span class="text-xs ${item.priority==='high'?'text-danger':item.priority==='middle'?'text-warning':'text-secondary'}">
+                            ${item.priority==='high'?'高优先级':item.priority==='middle'?'中优先级':'低优先级'}
+                        </span>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="toggleTask(${i})" class="text-secondary btn-effect"><i class="fa-solid fa-check"></i></button>
+                        <button onclick="delTask(${i})" class="text-danger btn-effect"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+            </div>`).join('');
+        }
+
+        taskForm.addEventListener('submit', e => {
+            e.preventDefault();
+            tasks.push({
+                title: document.getElementById('task-title').value,
+                type: document.getElementById('task-type').value,
+                ddl: document.getElementById('task-ddl').value,
+                priority: document.getElementById('task-priority').value,
+                done: false
+            });
+            Storage.set('tasks', tasks); renderTasks(); taskForm.reset();
+        });
+
+        window.toggleTask = i => {
+            tasks[i].done = !tasks[i].done; Storage.set('tasks', tasks); renderTasks();
+        }
+        window.delTask = i => {
+            tasks.splice(i,1); Storage.set('tasks', tasks); renderTasks();
+        }
+
+        // === 目标管理 ===
+        const goalForm = document.getElementById('goal-form');
+        const goalList = document.getElementById('goal-list');
+        let goals = Storage.get('goals');
+
+        function renderGoals() {
+            if(goals.length === 0) {
+                goalList.innerHTML = '<div class="text-gray-400 text-center py-12">暂无目标，快去添加吧~</div>'; return;
+            }
+            goalList.innerHTML = goals.map((item,i) => `
+            <div class="bg-white rounded-xl p-5 shadow-sm">
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="font-medium">${item.title}</h4>
+                    <button onclick="delGoal(${i})" class="text-danger btn-effect"><i class="fa-solid fa-trash"></i></button>
+                </div>
+                <p class="text-sm text-gray-500 mb-4">${item.desc || '无描述'}</p>
+                <div class="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-primary rounded-full transition-all duration-700" style="width:${(item.current/item.total)*100}%"></div>
+                </div>
+                <div class="flex justify-between text-xs text-gray-500 mt-3">
+                    <span>进度：${item.current}/${item.total}</span>
+                    <button onclick="addProgress(${i})" class="text-primary btn-effect">+1 进度</button>
+                </div>
+            </div>`).join('');
+        }
+
+        goalForm.addEventListener('submit', e => {
+            e.preventDefault();
+            goals.push({
+                title: document.getElementById('goal-title').value,
+                total: document.getElementById('goal-total').value,
+                current: 0,
+                desc: document.getElementById('goal-desc').value
+            });
+            Storage.set('goals', goals); renderGoals(); goalForm.reset();
+        });
+
+        window.addProgress = i => {
+            if(goals[i].current < goals[i].total) goals[i].current++;
+            Storage.set('goals', goals); renderGoals();
+        }
+        window.delGoal = i => {
+            goals.splice(i,1); Storage.set('goals', goals); renderGoals();
+        }
+
+        // === 专注模式 ===
+// 全局音频（预加载，解决浏览器限制）
+const alarmSound = new Audio("https://assets.mixkit.co/sfx/mp3/mixkit-software-interface-start-2574.mp3");
+alarmSound.volume = 1.0;
+
+// 播放声音（必须用户点击后才能成功）
+function playAlarm() {
+    alarmSound.currentTime = 0;
+    alarmSound.play().catch(e => {});
+}
+
+// 专注逻辑
+let focusTime = 25 * 60;
+let focusTimer = null;
+let todayFocus = Storage.get('todayFocus') || 0;
+const focusTxt = document.getElementById('focus-time');
+const todayTxt = document.getElementById('today-focus');
+const startBtn = document.getElementById('focus-start');
+const pauseBtn = document.getElementById('focus-pause');
+const resetBtn = document.getElementById('focus-reset');
+const customInput = document.getElementById('custom-focus');
+const applyBtn = document.getElementById('apply-custom');
+
+todayTxt.innerText = todayFocus;
+
+function fmt(t) {
+    const m = String(Math.floor(t / 60)).padStart(2, '0');
+    const s = String(t % 60).padStart(2, '0');
+    return `${m}:${s}`;
+}
+
+// 应用自定义时间
+applyBtn.addEventListener('click', () => {
+    let v = parseInt(customInput.value);
+    if (v > 0) {
+        focusTime = v * 60;
+        focusTxt.innerText = fmt(focusTime);
+    }
+});
+
+// 开始
+startBtn.addEventListener('click', () => {
+    if (focusTimer) return;
+
+    // 关键：用户点击时激活音频权限！！
+    playAlarm();
+
+    startBtn.classList.add('hidden');
+    pauseBtn.classList.remove('hidden');
+
+    focusTimer = setInterval(() => {
+        focusTime--;
+        focusTxt.innerText = fmt(focusTime);
+
+        if (focusTime <= 0) {
+            clearInterval(focusTimer);
+            focusTimer = null;
+
+            // 时间到 → 播放
+            playAlarm();
+
+            todayFocus += Math.floor((25 * 60 - focusTime) / 60);
+            Storage.set('todayFocus', todayFocus);
+            todayTxt.innerText = todayFocus;
+
+            alert('✅ 专注完成！时间到！');
+            startBtn.classList.remove('hidden');
+            pauseBtn.classList.add('hidden');
+        }
+    }, 1000);
+});
+
+// 暂停
+pauseBtn.addEventListener('click', () => {
+    clearInterval(focusTimer);
+    focusTimer = null;
+    startBtn.classList.remove('hidden');
+    pauseBtn.classList.add('hidden');
+});
+
+// 重置
+resetBtn.addEventListener('click', () => {
+    clearInterval(focusTimer);
+    focusTimer = null;
+    focusTime = 25 * 60;
+    focusTxt.innerText = "25:00";
+    startBtn.classList.remove('hidden');
+    pauseBtn.classList.add('hidden');
+});
+        // 初始化
+        window.onload = () => {
+            renderCourses(); renderTasks(); renderGoals();
+        }
+    </script>
+</body>
+</html>
